@@ -18,10 +18,10 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.Controller">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.Controller">
    <children>
       <MenuBar fx:id="menuBar" prefHeight="25.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
-      <SplitPane dividerPositions="0.4230769230769231" prefHeight="160.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
+      <SplitPane dividerPositions="0.5" prefHeight="160.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
         <items>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                <children>
@@ -36,19 +36,23 @@
                                     <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="100.0" />
                                 </columnConstraints>
                                 <rowConstraints>
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                 </rowConstraints>
                                  <children>
-                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Learning rule:" />
-                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Dataset" GridPane.rowIndex="1" />
-                                    <ChoiceBox fx:id="learningRuleChbx" prefWidth="150.0" GridPane.columnIndex="1" />
-                                    <ChoiceBox fx:id="datasetChbx" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                    <Button fx:id="trainBtn" mnemonicParsing="false" prefWidth="75.0" text="Train" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                                    <TextField fx:id="dataInputTxtFld" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                    <Button fx:id="executeBtn" mnemonicParsing="false" prefWidth="75.0" text="Execute" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Input:" GridPane.rowIndex="2" />
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Learning rule:" GridPane.rowIndex="1" />
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Dataset" GridPane.rowIndex="2" />
+                                    <ChoiceBox fx:id="learningRuleChbx" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <ChoiceBox fx:id="datasetChbx" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                    <Button fx:id="trainBtn" mnemonicParsing="false" prefWidth="75.0" text="Train" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                    <TextField fx:id="dataInputTxtFld" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                    <Button fx:id="executeBtn" mnemonicParsing="false" prefWidth="75.0" text="Execute" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Input:" GridPane.rowIndex="3" />
+                                    <Button fx:id="applyBtn" mnemonicParsing="false" prefWidth="75.0" text="Apply" GridPane.columnIndex="2" />
+                                    <TextField fx:id="netDescTxtFld" GridPane.columnIndex="1" />
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Net description:" />
                                  </children>
                               </GridPane>
                            </children>

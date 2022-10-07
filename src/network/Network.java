@@ -1,5 +1,6 @@
-package networks;
+package network;
 
+import Rules.Rule;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -7,13 +8,12 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 
-public abstract class Network {
+public class Network {
 
-    public double layerStep = Neuron.radius + 200;
-    public double neuronStep = Neuron.radius + 100;
-
-    public int inputSize;
+    private int inputSize;
     public final Neuron[][] neurons;
+    private double bias;
+    private Rule rule;
 
     public Network(int[] inputNeuronsCount){
         this.inputSize = inputNeuronsCount[0];
@@ -28,9 +28,60 @@ public abstract class Network {
         }
     }
 
-    public abstract void train(String path);
+    public void setRule(Rule rule){
+        this.rule = rule;
+        rule.setNetwork(this);
+    }
 
-    public abstract void simulate(String input);
+    public Rule getRule(){
+        return rule;
+    }
+
+    public void train(String dataset){
+        rule.train(dataset);
+    }
+
+    public int simulate(String[] input){
+
+        int sum = 0;
+        //Set input neurons value
+        for (int i = 0; i < neurons[0].length; i++) {
+            sum += neurons[0][i].fire(Integer.parseInt(input[i]));
+        }
+
+        System.out.println("simulate " +(sum + bias >= 0 ? 1 : -1));
+        neurons[neurons.length-1][0].setNeuronValue(sum + bias >= 0 ? 1 : -1);
+
+        return (sum + bias >= 0 ? 1 : -1);
+
+    }
+
+    public void updateBias(int targetValue) {
+        setBias(getBias() + targetValue);
+    }
+
+    public double getBias() {
+        return bias;
+    }
+
+    public void setBias(double bias) {
+        this.bias = bias;
+    }
+
+
+    public void reset(){
+        bias = 0;
+        for(int i = 0; i < neurons.length; i++){
+            for(int j = 0; j < neurons[i].length; j++){
+                neurons[i][j].reset();
+            }
+        }
+    }
+
+
+    //Drawing
+    public double layerStep = Neuron.radius + 200;
+    public double neuronStep = Neuron.radius + 100;
 
     public void draw(GraphicsContext gc){
 

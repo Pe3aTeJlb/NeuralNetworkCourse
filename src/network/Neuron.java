@@ -1,4 +1,4 @@
-package networks;
+package network;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
@@ -11,23 +11,16 @@ public class Neuron {
     private double weight;
     private int neuronValue;
 
-    public void updateWeight(int input, int target){
-        weight += input * target;
+    public void updateWeight(double weight){
+        this.weight = weight;
     }
-
-    /*
-    public void decreaseWeight(int input) {
-        weight -= input;
-        System.out.println(weight);
-    }
-
-    public void increaseWeight(int input) {
-        weight += input;
-        System.out.println(weight);
-    }*/
 
     public double getWeight() {
         return this.weight;
+    }
+
+    public double fire() {
+        return neuronValue * weight;
     }
 
     public double fire(int inputValue) {
@@ -38,6 +31,8 @@ public class Neuron {
     public void setNeuronValue(int neuronValue){
         this.neuronValue = neuronValue;
     }
+
+    public int getNeuronValue(){return neuronValue;}
 
     public void reset(){
         neuronValue = 0;

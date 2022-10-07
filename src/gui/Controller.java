@@ -1,5 +1,7 @@
 package gui;
 
+import Rules.Backpropagation;
+import Rules.Rule;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -10,13 +12,9 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.util.StringConverter;
-import networks.Network;
-import networks.hebbnet.DeltaNet;
-import networks.hebbnet.HebbNet;
-
-import java.io.File;
-import java.net.URL;
-import java.util.Arrays;
+import Rules.DeltaRule;
+import Rules.HebbRule;
+import network.Network;
 
 
 public class Controller {
@@ -26,7 +24,14 @@ public class Controller {
 
 
     @FXML
-    private ChoiceBox<Network> learningRuleChbx;
+    private TextField netDescTxtFld;
+
+    @FXML
+    private Button applyBtn;
+
+
+    @FXML
+    private ChoiceBox<Rule> learningRuleChbx;
 
 
     @FXML
@@ -51,6 +56,7 @@ public class Controller {
     private double[] transform;
     private double dragScreenX, dragScreenY;
 
+    private Network net;
 
     @FXML
     public void initialize(){
@@ -64,25 +70,39 @@ public class Controller {
         updateTransform();
 
 
-        ObservableList<Network> networks = FXCollections.observableArrayList();
-        networks.addAll(
-                new HebbNet(new int[]{2,1}),
-                new DeltaNet(new int[]{2,1})
+
+        applyBtn.setOnAction(event -> {
+            String[] netDesc = netDescTxtFld.getText().trim().split(" ");
+            int[] neuronsDesc = new int[netDesc.length];
+            for(int i = 0; i < netDesc.length; i++){
+                neuronsDesc[i] = Integer.parseInt(netDesc[i]);
+            }
+            net = new Network(neuronsDesc);
+            clearRect40K();
+            net.draw(cvcontext);
+        });
+
+
+        ObservableList<Rule> rules = FXCollections.observableArrayList();
+        rules.addAll(
+                new HebbRule(),
+                new DeltaRule(),
+                new Backpropagation()
 
         );
         learningRuleChbx.setConverter(new StringConverter<>() {
             @Override
-            public String toString(Network network) {
-                return network.toString();
+            public String toString(Rule rule) {
+                return rule.toString();
             }
 
             @Override
-            public Network fromString(String s) {
+            public Rule fromString(String s) {
                 return null;
             }
         });
-        learningRuleChbx.getItems().addAll(networks);
-        learningRuleChbx.setOnAction(event -> learningRuleChbx.getValue().draw(cvcontext));
+        learningRuleChbx.getItems().addAll(rules);
+        learningRuleChbx.setOnAction(event -> net.setRule(learningRuleChbx.getValue()));
 
 
         ObservableList<String> datasets = FXCollections.observableArrayList();
@@ -106,15 +126,16 @@ public class Controller {
         datasetChbx.setValue(datasets.get(0));
 
         trainBtn.setOnAction(event -> {
-            learningRuleChbx.getValue().train(datasetChbx.getValue());
+            if(net.getRule() == null) net.setRule(learningRuleChbx.getValue());
+            net.train(datasetChbx.getValue());
             clearRect40K(transform[4],transform[5]);
-            learningRuleChbx.getValue().draw(cvcontext);
+            net.draw(cvcontext);
         });
 
         executeBtn.setOnAction(event -> {
-            learningRuleChbx.getValue().simulate(dataInputTxtFld.getText());
+            net.simulate(dataInputTxtFld.getText().trim().split(" "));
             clearRect40K(transform[4],transform[5]);
-            learningRuleChbx.getValue().draw(cvcontext);
+            net.draw(cvcontext);
         });
 
 
@@ -221,8 +242,8 @@ public class Controller {
                 transform[3], transform[4], transform[5]
         );
 
-        if(learningRuleChbx.getValue() != null)
-        learningRuleChbx.getValue().draw(cvcontext);
+        if(net != null)
+        net.draw(cvcontext);
 
     }
 
