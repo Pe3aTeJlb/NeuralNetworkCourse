@@ -1,5 +1,6 @@
-package Rules;
+package rules;
 
+import network.BackprogNetwork;
 import network.Network;
 
 import java.io.InputStream;
@@ -8,13 +9,26 @@ import java.util.Scanner;
 
 public class Backpropagation extends Rule{
 
+    private BackprogNetwork net;
+
     private double delta;
     private double learnSpeed = 5;
     private int error;
 
+    public Backpropagation(int[] inputNeuronsCount){
+        net = new BackprogNetwork(inputNeuronsCount);
+        net.setRule(this);
+    }
+
     @Override
     public void setNetwork(Network network) {
-        this.net = network;
+        net = (BackprogNetwork) network;
+        net.setRule(this);
+    }
+
+    @Override
+    public Network getNetwork() {
+        return null;
     }
 
     @Override
@@ -41,8 +55,7 @@ public class Backpropagation extends Rule{
                 error += delta;
 
                 for (int i = 0; i < net.neurons[0].length; i++) {
-                    net.neurons[0][i].updateWeight(
-                            net.neurons[0][i].getWeight() + delta * Integer.parseInt(data[i]) * learnSpeed);
+                    net.neurons[0][i].updateWeight(delta * Integer.parseInt(data[i]) * learnSpeed);
                 }
 
                 net.updateBias(Integer.parseInt(data[2]));

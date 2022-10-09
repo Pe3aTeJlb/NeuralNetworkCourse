@@ -1,7 +1,6 @@
 package gui;
 
-import Rules.Backpropagation;
-import Rules.Rule;
+import rules.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -12,8 +11,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.util.StringConverter;
-import Rules.DeltaRule;
-import Rules.HebbRule;
 import network.Network;
 
 
@@ -31,7 +28,7 @@ public class Controller {
 
 
     @FXML
-    private ChoiceBox<Rule> learningRuleChbx;
+    private ChoiceBox<String> learningRuleChbx;
 
 
     @FXML
@@ -56,6 +53,7 @@ public class Controller {
     private double[] transform;
     private double dragScreenX, dragScreenY;
 
+    private Rule rule;
     private Network net;
 
     @FXML
@@ -71,45 +69,46 @@ public class Controller {
 
 
 
+        applyBtn.disableProperty().bind(learningRuleChbx.valueProperty().isNull().or(netDescTxtFld.textProperty().isEmpty()));
         applyBtn.setOnAction(event -> {
             String[] netDesc = netDescTxtFld.getText().trim().split(" ");
             int[] neuronsDesc = new int[netDesc.length];
             for(int i = 0; i < netDesc.length; i++){
                 neuronsDesc[i] = Integer.parseInt(netDesc[i]);
             }
-            net = new Network(neuronsDesc);
+
+            switch (learningRuleChbx.getValue()){
+
+                case "HebbRule": rule = new HebbRule(neuronsDesc); break;
+                case "DeltaRule": rule = new DeltaRule(neuronsDesc); break;
+                case "BackPropagation": rule = new Backpropagation(neuronsDesc); break;
+                case "RBFNRule":  rule = new RBFNRule(neuronsDesc); break;
+
+            }
+
+            net = rule.getNetwork();
             clearRect40K();
             net.draw(cvcontext);
+
         });
 
 
-        ObservableList<Rule> rules = FXCollections.observableArrayList();
+        ObservableList<String> rules = FXCollections.observableArrayList();
         rules.addAll(
-                new HebbRule(),
-                new DeltaRule(),
-                new Backpropagation()
-
+                "HebbRule",
+                "DeltaRule",
+                "BackPropagation",
+                "RBFNRule"
         );
-        learningRuleChbx.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(Rule rule) {
-                return rule.toString();
-            }
-
-            @Override
-            public Rule fromString(String s) {
-                return null;
-            }
-        });
         learningRuleChbx.getItems().addAll(rules);
-        learningRuleChbx.setOnAction(event -> net.setRule(learningRuleChbx.getValue()));
 
 
         ObservableList<String> datasets = FXCollections.observableArrayList();
         datasets.addAll(
                 "/And.txt",
                 "/Or.txt",
-                "/XOR.txt"
+                "/XOR.txt",
+                "/XNOR.txt"
         );
         datasetChbx.setConverter(new StringConverter<>() {
             @Override
@@ -126,7 +125,6 @@ public class Controller {
         datasetChbx.setValue(datasets.get(0));
 
         trainBtn.setOnAction(event -> {
-            if(net.getRule() == null) net.setRule(learningRuleChbx.getValue());
             net.train(datasetChbx.getValue());
             clearRect40K(transform[4],transform[5]);
             net.draw(cvcontext);

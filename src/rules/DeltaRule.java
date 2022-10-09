@@ -1,17 +1,35 @@
-package Rules;
+package rules;
 
 import network.Network;
+import network.SimpleNetwork;
 
-import java.io.*;
+import java.io.InputStream;
 import java.util.Scanner;
 
-public class HebbRule extends Rule {
+public class DeltaRule extends Rule {
+
+    private SimpleNetwork net;
+
+    private double delta;
+    private double learnSpeed = 5;
+
+    public DeltaRule(int[] inputNeuronsCount){
+        net = new SimpleNetwork(inputNeuronsCount);
+        net.setRule(this);
+    }
 
     @Override
     public void setNetwork(Network network) {
-        this.net = network;
+        net = (SimpleNetwork) network;
+        net.setRule(this);
     }
 
+    @Override
+    public Network getNetwork() {
+        return net;
+    }
+
+    @Override
     public void train(String dataset) {
 
         net.reset();
@@ -26,10 +44,10 @@ public class HebbRule extends Rule {
             String[] data =  line.trim().split(" ");
             System.out.println("input: " + line);
 
+            delta = Integer.parseInt(data[2]) - net.simulate(data);
+
             for(int i = 0; i < net.neurons[0].length; i++){
-                net.neurons[0][i].updateWeight(
-                        net.neurons[0][i].getWeight() + Integer.parseInt(data[i])*Integer.parseInt(data[2])
-                );
+                net.neurons[0][i].updateWeight(delta * Integer.parseInt(data[i]) * learnSpeed);
             }
 
             net.updateBias(Integer.parseInt(data[2]));
@@ -40,7 +58,7 @@ public class HebbRule extends Rule {
 
     @Override
     public String toString(){
-        return "Hebb rule";
+        return "Delta rule";
     }
 
 }

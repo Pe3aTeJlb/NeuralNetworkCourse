@@ -50,7 +50,7 @@
                                     <TextField fx:id="dataInputTxtFld" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                                     <Button fx:id="executeBtn" mnemonicParsing="false" prefWidth="75.0" text="Execute" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                                     <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Input:" GridPane.rowIndex="3" />
-                                    <Button fx:id="applyBtn" mnemonicParsing="false" prefWidth="75.0" text="Apply" GridPane.columnIndex="2" />
+                                    <Button fx:id="applyBtn" mnemonicParsing="false" prefWidth="75.0" text="Apply" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                                     <TextField fx:id="netDescTxtFld" GridPane.columnIndex="1" />
                                     <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Net description:" />
                                  </children>

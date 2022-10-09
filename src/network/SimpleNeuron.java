@@ -4,30 +4,31 @@ import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public abstract class Neuron {
+public class SimpleNeuron extends Neuron{
 
-    public static final double radius = 100;
-
-    public Point2D pos;
-    public double weight;
-    public double neuronValue;
-
-    public void updateWeight(double weight){
-        this.weight = weight;
+    @Override
+    public void updateWeight(double addWeight){
+        this.weight += addWeight;
+        System.out.println("new weight " + weight);
     }
 
     public double getWeight() {
         return this.weight;
     }
 
-    public double fire(){
-        return neuronValue;
+    public double fire(double inputValue) {
+        neuronValue = inputValue;
+        return inputValue * weight;
     }
 
-    public abstract void reset();
+    @Override
+    public void reset(){
+        neuronValue = 0;
+        weight = 0;
+    }
 
 
-    public void setNeuronValue(double neuronValue){
+    public void setNeuronValue(int neuronValue){
         this.neuronValue = neuronValue;
     }
 
@@ -42,10 +43,6 @@ public abstract class Neuron {
         gc.setFill(Color.BLACK);
         gc.fillText(Double.toString(neuronValue), posX + radius/2, posY + radius/2);
         pos = new Point2D(posX, posY);
-    }
-
-    public Point2D getPos(){
-        return pos;
     }
 
 }
