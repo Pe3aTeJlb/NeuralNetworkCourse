@@ -4,37 +4,59 @@ import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public abstract class Neuron {
+import java.util.Arrays;
+import java.util.function.Function;
+
+public class Neuron {
 
     public static final double radius = 100;
 
-    public Point2D pos;
-    public double weight;
-    public double neuronValue;
+    protected Point2D pos;
+    public int indexInLayer;
+    public int wCount;
+    protected double[] weight;
+    protected double neuronValue;
 
-    public void updateWeight(double weight){
-        this.weight = weight;
+    private Function<Double, Double> activationFunc = (x) -> x > 0 ? 1.0 : -1.0;
+
+    public Neuron(int indexInLayer, int weightCount){
+        this.indexInLayer = indexInLayer;
+        wCount = weightCount;
+        weight = new double[weightCount];
     }
 
-    public double getWeight() {
-        return this.weight;
+    public void updateWeight(int index, double addWeight){
+        this.weight[index] += addWeight;
+       // System.out.println("new weight " + weight[index]);
     }
 
-    public double fire(){
-        return neuronValue;
+    public double getWeight(int index) {
+        return this.weight[index];
     }
 
-    public abstract void reset();
-
-
-    public void setNeuronValue(double neuronValue){
-        this.neuronValue = neuronValue;
+    public double fire(int index){
+        return neuronValue * weight[index];
     }
 
+    public double fire(int index, double input){
+        return activationFunc.apply(input) * weight[index];
+    }
+
+    public void activate(double input){
+        neuronValue = activationFunc.apply(input);
+    }
+
+    public void reset(){
+        neuronValue = 0;
+        Arrays.fill(weight, 0.0);
+    }
+
+
+    public void setNeuronValue(double value){neuronValue = value;}
     public double getNeuronValue(){return neuronValue;}
 
 
-    public void draw(GraphicsContext gc, double posX, double posY){
+    protected void draw(GraphicsContext gc, double posX, double posY){
         gc.setFill(Color.YELLOW);
         gc.setStroke(Color.BLACK);
         gc.strokeOval(posX, posY, radius, radius);

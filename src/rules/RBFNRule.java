@@ -12,10 +12,6 @@ public class RBFNRule extends Rule{
 
     private RBFNetwork net;
 
-    private final double sigma = 0.5;
-    private final double n1 = 0.1;
-    private final double n2 = 0.1;
-
     public RBFNRule(int[] inputNeuronsCount){
         this.net = new RBFNetwork(inputNeuronsCount);
         net.setRule(this);
@@ -33,9 +29,33 @@ public class RBFNRule extends Rule{
     }
 
     public void train(String dataset) {
-
-        //Process input
+/*
         net.reset();
+
+        ArrayList<double[]> inputs = new ArrayList<>();
+        ArrayList<double[]> outputs = new ArrayList<>();
+        ArrayList<double[]> centers = new ArrayList<>();
+
+        InputStream inputStream = HebbRule.class.getResourceAsStream(dataset);
+        Scanner reader = new Scanner(inputStream);
+        while (reader.hasNextLine()) {
+
+            String line = reader.nextLine();
+            if(line.equals("")) continue;
+
+            //input input to double vector
+            String[] buff =  line.trim().split(" ");
+            double[] data = new double[buff.length];
+            for(int i = 0; i < buff.length; i++){
+                data[i] = Double.parseDouble(buff[i]);
+            }
+
+            outputs.add(data.)
+            if(Double.parseDouble(data[data.length-1]) == 1){
+                centers.add(Arrays.copyOfRange(input, 0, input.length-1));
+            }
+
+        }
 
         InputStream inputStream = HebbRule.class.getResourceAsStream(dataset);
         Scanner reader = new Scanner(inputStream);
@@ -72,15 +92,15 @@ public class RBFNRule extends Rule{
 
             double netOutput = 0;
             for (int j = 0; j < inputs.get(i).length - 1; j++){
-                netOutput += net.neurons[0][j].fire(inputs.get(i));
+                netOutput += net.neurons[0][j].fire(0, inputs.get(i));
             }
 
             for (int j = 0; j < inputs.get(i).length - 1; j++){
-                net.neurons[0][j].updateWeight(inputs.get(i), inputs.get(i)[inputs.get(i).length-1], netOutput);
+                net.neurons[0][j].updateWeight(0, inputs.get(i), inputs.get(i)[inputs.get(i).length-1], netOutput);
             }
 
         }
-
+*/
     }
 
     @Override

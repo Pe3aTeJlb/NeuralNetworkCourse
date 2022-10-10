@@ -13,24 +13,28 @@ public class RBFNeuron extends Neuron{
     private double n1 = 0.5;
     private double n2 = 0.5;
 
-    private double[] neuronVector;
+    private double[] neuronVector = new double[2];
 
-    public void updateWeight(double[] input, double desired, double netOutput){
+    public RBFNeuron(int layerIndex, int weightCount){
+        super(layerIndex, weightCount);
+    }
+
+    public void updateWeight(int index, double[] input, double desired, double netOutput){
 
         double phi = phi(input);
         double diffOutput = desired - netOutput;
 
         for(int i = 0; i < center.length; i++) {
-            center[i] = center[i] + (n1 * diffOutput * weight * phi * (input[i] - center[i]) / (sigma * sigma));
+            center[i] = center[i] + (n1 * diffOutput * weight[index] * phi * (input[i] - center[i]) / (sigma * sigma));
         }
 
-        weight += n2 * diffOutput * phi;
+        weight[index] += n2 * diffOutput * phi;
 
     }
 
-    public double fire(double[] inputValue) {
+    public double fire(int index, double[] inputValue) {
         neuronVector = inputValue;
-        return phi(inputValue) * weight;
+        return phi(inputValue) * weight[index];
     }
 
 
@@ -42,12 +46,16 @@ public class RBFNeuron extends Neuron{
         return Math.pow(Math.E,-distance / (2 * Math.pow(sigma, 2)));
     }
 
+    public void setNeuronVector(double[] neuronVector){
+        this.neuronVector = neuronVector;
+    }
+
     @Override
     public void reset(){
         neuronValue = 0;
-        neuronVector = new double[2];
-        weight = 0;
-        center = new double[center.length];
+        Arrays.fill(neuronVector, 0);
+        Arrays.fill(weight, 0);
+        Arrays.fill(center, 0);
     }
 
     public void setCenter(double[] center){
@@ -62,7 +70,7 @@ public class RBFNeuron extends Neuron{
         gc.fillOval(posX, posY, radius, radius);
         gc.setFill(Color.BLACK);
         if(neuronValue != 0) {
-            gc.fillText(Double.toString(neuronValue), posX + radius/2, posY + radius/2);
+            gc.fillText(String.format("%.4f", neuronValue), posX + radius/2, posY + radius/2);
         } else {
             gc.fillText(Arrays.toString(neuronVector), posX + radius / 2, posY + radius / 2);
         }

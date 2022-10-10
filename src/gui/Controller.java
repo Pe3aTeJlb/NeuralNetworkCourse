@@ -106,9 +106,13 @@ public class Controller {
         ObservableList<String> datasets = FXCollections.observableArrayList();
         datasets.addAll(
                 "/And.txt",
+                "/AndZ.txt",
                 "/Or.txt",
+                "/OrZ.txt",
                 "/XOR.txt",
-                "/XNOR.txt"
+                "/XORZ.txt",
+                "/XNOR.txt",
+                "/XNORZ.txt"
         );
         datasetChbx.setConverter(new StringConverter<>() {
             @Override

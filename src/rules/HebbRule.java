@@ -1,23 +1,26 @@
 package rules;
 
 import network.Network;
-import network.SimpleNetwork;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Random;
 import java.util.Scanner;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class HebbRule extends Rule {
 
-    private SimpleNetwork net;
+    private Network net;
 
     public HebbRule(int[] inputNeuronsCount){
-        net = new SimpleNetwork(inputNeuronsCount);
+        net = new Network(inputNeuronsCount);
         net.setRule(this);
     }
 
     @Override
     public void setNetwork(Network network) {
-        net = (SimpleNetwork) network;
+        net = network;
         net.setRule(this);
     }
 
@@ -31,6 +34,7 @@ public class HebbRule extends Rule {
 
         net.reset();
 
+        ArrayList<double[]> parsedData = new ArrayList<>();
         InputStream inputStream = HebbRule.class.getResourceAsStream(dataset);
         Scanner reader = new Scanner(inputStream);
         while (reader.hasNextLine()) {
@@ -38,16 +42,54 @@ public class HebbRule extends Rule {
             String line = reader.nextLine();
             if(line.equals("")) continue;
 
-            String[] data =  line.trim().split(" ");
-            System.out.println("input: " + line);
-
-            for(int i = 0; i < net.neurons[0].length; i++){
-                net.neurons[0][i].updateWeight(Integer.parseInt(data[i])*Integer.parseInt(data[2]));
+            //input input to double vector
+            String[] buff =  line.trim().split(" ");
+            double[] data = new double[buff.length];
+            for(int i = 0; i < buff.length; i++){
+                data[i] = Double.parseDouble(buff[i]);
             }
 
-            net.updateBias(Integer.parseInt(data[2]));
+            parsedData.add(data);
 
         }
+
+
+
+        for (int cnt = 0; cnt < 100; cnt++) {
+
+            double[] data = parsedData.get(ThreadLocalRandom.current().nextInt(0, parsedData.size()));
+            System.out.println(cnt + " input: " + Arrays.toString(data));
+
+            //make desire output vector
+            double[] desireOutput = Arrays.copyOfRange(data, data.length - net.outputSize, data.length);
+            System.out.println("desireOutput " + Arrays.toString(desireOutput));
+
+            //Simulate with current data vector
+            double[] netResult = net.simulate(Arrays.copyOfRange(data, 0, data.length - net.outputSize));
+            System.out.println("netOut " + Arrays.toString(netResult));
+
+            //If net output != desire output then update weights
+            if(Arrays.compare(netResult, desireOutput) != 0){
+
+                for(int i = 0; i < net.neurons.length - 1; i++){
+                    for(int j = 0; j < net.neurons[i].length; j++){
+                        for(int k = 0; k < net.neurons[i][j].wCount; k++) {
+                            for (int m = 0; m < desireOutput.length; m++) {
+                                net.neurons[i][j].updateWeight(k, data[j] * desireOutput[m]);
+                            }
+                        }
+                    }
+                }
+
+                net.updateBias(-data[data.length - 1]);
+
+            }
+
+            System.out.println("");
+
+        }
+
+        System.out.println("Bias " + net.getBias());
 
     }
 
