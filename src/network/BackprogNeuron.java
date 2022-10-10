@@ -11,23 +11,31 @@ import java.util.function.Function;
 public class BackprogNeuron extends Neuron{
 
     private Function<Double, Double> activationFunc = (x) -> 1 / (1 + Math.pow(Math.E,-x));
-    private final double rangeMin = -0.5;
-    private final double rangeMax = 0.5;
+    private final double rangeMin = -0.4;
+    private final double rangeMax = 0.4;
+
+    public double threshold;
 
     public BackprogNeuron(int layerIndex, int weightCount){
         super(layerIndex, weightCount);
     }
 
     @Override
-    public void activate(double input){
-        neuronValue = activationFunc.apply(input);
+    public double fire(int index){
+        return neuronValue * weight[index];
     }
 
+    @Override
+    public void activate(double input){
+        neuronValue = activationFunc.apply(input);
+        System.out.println("actiovation " + neuronValue + " with input " + input);
+    }
+/*
     @Override
     public double fire(int index, double input){
         return activationFunc.apply(input) * weight[index];
     }
-
+*/
     @Override
     public void reset(){
         neuronValue = 0;
@@ -35,6 +43,7 @@ public class BackprogNeuron extends Neuron{
         Random r = new Random();
         for(int i = 0; i < wCount; i++){
             weight[i] = rangeMin + (rangeMax - rangeMin) * r.nextDouble();
+            threshold = 1;
         }
     }
 

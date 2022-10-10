@@ -52,6 +52,8 @@ public class BackprogNetwork extends Network{
                     for(int k = 0; k < neurons[i - 1].length; k++){
                         layerSum += neurons[i - 1][k].fire(j);
                     }
+                    layerSum -= neurons[i][j].threshold;
+                    System.out.println("laysum " + layerSum);
                     neurons[i][j].activate(layerSum);
                 }
 

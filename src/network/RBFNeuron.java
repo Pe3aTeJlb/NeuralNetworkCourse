@@ -5,13 +5,17 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 import java.util.Arrays;
+import java.util.Random;
 
 public class RBFNeuron extends Neuron{
 
     private double[] center = new double[2];
     private double sigma = 0.5;
-    private double n1 = 0.5;
-    private double n2 = 0.5;
+    private double n1 = 0.1;
+    private double n2 = 0.1;
+
+    private final double rangeMin = -0.5;
+    private final double rangeMax = 0.5;
 
     private double[] neuronVector = new double[2];
 
@@ -19,16 +23,22 @@ public class RBFNeuron extends Neuron{
         super(layerIndex, weightCount);
     }
 
-    public void updateWeight(int index, double[] input, double desired, double netOutput){
+    public void updateWeight(double[] input, double[] desired, double[] netOutput){
 
         double phi = phi(input);
-        double diffOutput = desired - netOutput;
-
-        for(int i = 0; i < center.length; i++) {
-            center[i] = center[i] + (n1 * diffOutput * weight[index] * phi * (input[i] - center[i]) / (sigma * sigma));
+        //double diffOutput = desired - netOutput;
+        double[] delta = new double[desired.length];
+        for(int i = 0; i < delta.length; i++){
+            delta[i] = desired[i] - netOutput[i];
         }
 
-        weight[index] += n2 * diffOutput * phi;
+        for(int i = 0; i < desired.length; i++) {
+            for (int j = 0; j < center.length; j++) {
+                center[j] = center[j] + (n1 * delta[i] * weight[i] * phi * (input[i] - center[i]) / (sigma * sigma));
+            }
+
+            weight[i] += n2 * delta[i] * phi;
+        }
 
     }
 
@@ -54,8 +64,11 @@ public class RBFNeuron extends Neuron{
     public void reset(){
         neuronValue = 0;
         Arrays.fill(neuronVector, 0);
-        Arrays.fill(weight, 0);
         Arrays.fill(center, 0);
+        Random r = new Random();
+        for(int i = 0; i < wCount; i++){
+            weight[i] = rangeMin + (rangeMax - rangeMin) * r.nextDouble();
+        }
     }
 
     public void setCenter(double[] center){

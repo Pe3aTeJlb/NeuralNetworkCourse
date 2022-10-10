@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class RBFNRule extends Rule{
 
@@ -29,7 +30,7 @@ public class RBFNRule extends Rule{
     }
 
     public void train(String dataset) {
-/*
+
         net.reset();
 
         ArrayList<double[]> inputs = new ArrayList<>();
@@ -50,57 +51,39 @@ public class RBFNRule extends Rule{
                 data[i] = Double.parseDouble(buff[i]);
             }
 
-            outputs.add(data.)
-            if(Double.parseDouble(data[data.length-1]) == 1){
-                centers.add(Arrays.copyOfRange(input, 0, input.length-1));
-            }
-
-        }
-
-        InputStream inputStream = HebbRule.class.getResourceAsStream(dataset);
-        Scanner reader = new Scanner(inputStream);
-        ArrayList<double[]> inputs = new ArrayList<>();
-        ArrayList<double[]> centers = new ArrayList<>();
-
-        while (reader.hasNextLine()) {
-
-            String line = reader.nextLine();
-            if(line.equals("")) continue;
-
-            String[] data =  line.trim().split(" ");
-            System.out.println("input: " + line);
-
-            double[] input = new double[data.length];
-            for(int i = 0; i < data.length; i++){
-                input[i] = Double.parseDouble(data[i]);
-            }
-            inputs.add(input);
-            if(Double.parseDouble(data[data.length-1]) == 1){
-                centers.add(Arrays.copyOfRange(input, 0, input.length-1));
+            inputs.add(Arrays.copyOfRange(data, 0, data.length - net.outputSize));
+            outputs.add(Arrays.copyOfRange(data, data.length - net.outputSize, data.length));
+            if(data[data.length-1] == 1){
+                centers.add(Arrays.copyOfRange(data, 0, data.length - net.outputSize));
             }
 
         }
 
         //set centers
-        for(int i = 0; i < centers.size(); i++){
-            net.neurons[0][i].setCenter(centers.get(i));
+        for(int i = 0; i < net.inputSize; i++){
+            if(i != centers.size()) {
+                net.neurons[0][i].setCenter(centers.get(i));
+            } else {
+                net.neurons[0][i].setCenter(centers.get(centers.size()-1));
+            }
         }
 
-        //Train network
+        for (int cnt = 0; cnt < 1000; cnt++) {
 
-        for(int i = 0; i < inputs.size(); i++) {
+            //Train network
+            int pointer = ThreadLocalRandom.current().nextInt(0, inputs.size());
+            double[] data = inputs.get(pointer);
 
-            double netOutput = 0;
-            for (int j = 0; j < inputs.get(i).length - 1; j++){
-                netOutput += net.neurons[0][j].fire(0, inputs.get(i));
-            }
+            //Simulate with current data vector
+            double[] netResult = net.simulate(data);
+            System.out.println("    netOut " + Arrays.toString(netResult));
 
-            for (int j = 0; j < inputs.get(i).length - 1; j++){
-                net.neurons[0][j].updateWeight(0, inputs.get(i), inputs.get(i)[inputs.get(i).length-1], netOutput);
+            for (int j = 0; j < data.length; j++) {
+                net.neurons[0][j].updateWeight(data, outputs.get(pointer), netResult);
             }
 
         }
-*/
+
     }
 
     @Override
@@ -140,7 +123,6 @@ class rbfn {
                 double predictedoutput=0;
                 for(int j=0;j<inputs[i].length;j++){
                     predictedoutput+=net[j].phi(inputs[i])*net[j].w;
-
                 }
                 //predictedoutput= Math.round(predictedoutput);
 

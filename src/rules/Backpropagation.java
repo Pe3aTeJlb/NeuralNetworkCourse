@@ -7,18 +7,32 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class Backpropagation extends Rule{
 
     private BackprogNetwork net;
 
-    private double learnSpeed = 0.5;
+    private double learnSpeed = 0.01;
     private double netMeanSquaredError;
 
     public Backpropagation(int[] inputNeuronsCount){
         net = new BackprogNetwork(inputNeuronsCount);
         net.setRule(this);
+
+        net.neurons[0][0].updateWeight(0, 1);
+        net.neurons[0][0].updateWeight(1, -1);
+
+        net.neurons[0][1].updateWeight(0, 0.5);
+        net.neurons[0][1].updateWeight(1, 2);
+
+        net.neurons[1][0].updateWeight(0, 1.5);
+        net.neurons[1][0].threshold = 1;
+
+        net.neurons[1][1].updateWeight(0, -1);
+        net.neurons[1][1].threshold = 1;
+
+        net.neurons[2][0].threshold = 1;
+
     }
 
     @Override
@@ -35,7 +49,7 @@ public class Backpropagation extends Rule{
     @Override
     public void train(String dataset) {
 
-        net.reset();
+       // net.reset();
 
         ArrayList<double[]> parsedData = new ArrayList<>();
         InputStream inputStream = HebbRule.class.getResourceAsStream(dataset);
@@ -56,68 +70,83 @@ public class Backpropagation extends Rule{
 
         }
 
-        int cnt = 0;
-      //  do {
+        netMeanSquaredError = 0;
+        //int cnt = 0;
+        for(double[] data: parsedData) {
+         //   do {
 
-            double[] data = parsedData.get(ThreadLocalRandom.current().nextInt(0, parsedData.size()));
-            System.out.println(cnt + " input: " + Arrays.toString(data));
+            for (int cnt = 0; cnt < 100; cnt++) {
 
-            //make desire output vector
-            double[] desireOutput = Arrays.copyOfRange(data, data.length - net.outputSize, data.length);
-            System.out.println("desireOutput " + Arrays.toString(desireOutput));
+                //double[] data = parsedData.get(cnt);
+                System.out.println(cnt + " input: " + Arrays.toString(data));
 
-            //Simulate with current data vector
-            double[] netResult = net.simulate(Arrays.copyOfRange(data, 0, data.length - net.outputSize));
-            System.out.println("netOut " + Arrays.toString(netResult));
+                //make desire output vector
+                double[] desireOutput = Arrays.copyOfRange(data, data.length - net.outputSize, data.length);
+                System.out.println("desireOutput " + Arrays.toString(desireOutput));
 
-            //Calculate mse error
-            netMeanSquaredError = 0;
-            for (int i = 0; i < netResult.length; i++) {
-                netMeanSquaredError += 0.5 * Math.pow(desireOutput[i] - netResult[i], 2);
-            }
-            System.out.println("MSE " + netMeanSquaredError);
+                //Simulate with current data vector
+                double[] netResult = net.simulate(Arrays.copyOfRange(data, 0, data.length - net.outputSize));
+                System.out.println("    netOut " + Arrays.toString(netResult));
 
-
-            //Error for each output neuron
-            double[] outError = new double[net.neurons[net.neurons.length - 1].length];
-            for(int i = 0; i < net.neurons[net.neurons.length - 1].length; i++){
-                outError[i] = (desireOutput[i] - netResult[i]) * sigmoidDerivative(netResult[i]);
-            }
-            System.out.println("outError " + Arrays.toString(outError));
-
-            //Error for hidden neuron
-            double[] hidError = new double[net.neurons[net.neurons.length - 2].length];
-            for(int i = 0; i < net.neurons[net.neurons.length - 2].length; i++){
-                hidError[i] = 0;
-                for(int j = 0; j < net.outputSize; j++){
-                    hidError[i] += net.neurons[net.neurons.length - 2][i].getWeight(j) * outError[j];
+                //Calculate mse error
+                for (int i = 0; i < netResult.length; i++) {
+                    netMeanSquaredError += 0.5 * Math.pow(desireOutput[i] - netResult[i], 2);
                 }
-                hidError[i] *= sigmoidDerivative(net.neurons[net.neurons.length - 2][i].getNeuronValue());
-            }
-            System.out.println("hidError " + Arrays.toString(hidError));
+                System.out.println("total MSE " + netMeanSquaredError);
 
-            //Update weights for layers
-            for(int i = 0; i < net.outputSize; i++){
-                for(int j = 0; j < net.neurons[net.neurons.length-2].length; j++) {
-                    net.neurons[net.neurons.length-2][j].updateWeight(
-                            i, learnSpeed * outError[i] * net.neurons[net.neurons.length-2][j].getNeuronValue()
-                    );
+
+                //Error for each output neuron
+                double[] outError = new double[net.neurons[net.neurons.length - 1].length];
+                for (int i = 0; i < net.neurons[net.neurons.length - 1].length; i++) {
+                    outError[i] = (desireOutput[i] - netResult[i]) * sigmoidDerivative(netResult[i]);
                 }
-            }
+                System.out.println("outError " + Arrays.toString(outError));
 
-            for(int i = 0; i < net.neurons[net.neurons.length-2].length; i++){
-                for(int j = 0; j < net.neurons[0].length; j++){
-                    net.neurons[0][j].updateWeight(
-                            i,  learnSpeed * hidError[i] * net.neurons[i][j].getNeuronValue()
-                    );
+                //Error for hidden neuron
+                double[] hidError = new double[net.neurons[net.neurons.length - 2].length];
+                for (int i = 0; i < net.neurons[net.neurons.length - 2].length; i++) {
+                    hidError[i] = 0;
+                    for (int j = 0; j < net.outputSize; j++) {
+                        hidError[i] = net.neurons[net.neurons.length - 2][i].getWeight(j) * outError[j];
+                    }
+                    hidError[i] *= sigmoidDerivative(net.neurons[net.neurons.length - 2][i].getNeuronValue());
                 }
+                System.out.println("hidError " + Arrays.toString(hidError));
+
+
+                //Update weights for layers
+                for (int i = 0; i < net.neurons[net.neurons.length - 2].length; i++) {
+                    for (int j = 0; j < net.outputSize; j++) {
+                        net.neurons[net.neurons.length - 2][i].updateWeight(
+                                j, learnSpeed * outError[j] * net.neurons[net.neurons.length - 2][i].getNeuronValue()
+                        );
+                    }
+                }
+
+                for (int j = 0; j < net.outputSize; j++) {
+                    net.neurons[net.neurons.length - 1][j].threshold -= learnSpeed * outError[j];
+                    System.out.println(net.neurons.length - 1 + " " + j + " " + net.neurons[net.neurons.length - 1][j].threshold);
+                }
+
+                for (int i = 0; i < net.neurons[0].length; i++) {
+                    for (int j = 0; j < net.neurons[net.neurons.length - 2].length; j++) {
+                        net.neurons[0][i].updateWeight(
+                                j, learnSpeed * hidError[j] * net.neurons[net.neurons.length - 2][j].getNeuronValue()
+                        );
+                    }
+                }
+
+                for (int j = 0; j < net.neurons[net.neurons.length - 2].length; j++) {
+                    net.neurons[net.neurons.length - 2][j].threshold -= learnSpeed * hidError[j];
+                    System.out.println(net.neurons.length - 2 + " " + j + " " + net.neurons[net.neurons.length - 2][j].threshold);
+                }
+
+                System.out.println("");
+                //cnt++;
+
             }
-
-            System.out.println("");
-            cnt++;
-
-       // } while (netMeanSquaredError > 0.01);
-
+           // } while (cnt <= 3 || netMeanSquaredError > 0.05);
+        }
     }
 
     private double sigmoidDerivative(double val) {
