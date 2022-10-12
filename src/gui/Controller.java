@@ -83,6 +83,7 @@ public class Controller {
                 case "DeltaRule": rule = new DeltaRule(neuronsDesc); break;
                 case "BackPropagation": rule = new Backpropagation(neuronsDesc); break;
                 case "RBFNRule":  rule = new RBFNRule(neuronsDesc); break;
+                case "Kohonen Net": rule = new Kohonen(neuronsDesc); break;
 
             }
 
@@ -98,7 +99,8 @@ public class Controller {
                 "HebbRule",
                 "DeltaRule",
                 "BackPropagation",
-                "RBFNRule"
+                "RBFNRule",
+                "Kohonen Net"
         );
         learningRuleChbx.getItems().addAll(rules);
 
@@ -112,7 +114,8 @@ public class Controller {
                 "/XOR.txt",
                 "/XORZ.txt",
                 "/XNOR.txt",
-                "/XNORZ.txt"
+                "/XNORZ.txt",
+                "/Kohonen.txt"
         );
         datasetChbx.setConverter(new StringConverter<>() {
             @Override
