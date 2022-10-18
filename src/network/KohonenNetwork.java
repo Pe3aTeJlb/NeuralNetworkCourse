@@ -8,20 +8,20 @@ import javafx.scene.text.FontWeight;
 
 public class KohonenNetwork extends Network{
 
-    public KohonenNeuron[][] neurons;
+    public Neuron[][] neurons;
 
     public KohonenNetwork(int[] layersDesk) {
 
         super(layersDesk);
 
-        this.neurons = new KohonenNeuron[layersDesk.length][];
+        this.neurons = new Neuron[layersDesk.length][];
         for(int i = 0; i < layersDesk.length; i++){
-            neurons[i] = new KohonenNeuron[layersDesk[i]];
+            neurons[i] = new Neuron[layersDesk[i]];
         }
 
         for (int i = 0; i < layersDesk.length; i++) {
             for(int j = 0; j < layersDesk[i]; j++) {
-                if (i == 0) neurons[i][j] = new KohonenNeuron(j, layersDesk[i + 1]);
+                if (i == 0) neurons[i][j] = new Neuron(j, layersDesk[i + 1]);
                 else        neurons[i][j] = new KohonenNeuron(j,0);
             }
         }
@@ -41,9 +41,11 @@ public class KohonenNetwork extends Network{
 
     @Override
     public double[] simulate(double[] input){
+
+        clearNeurons();
         //Update input layers weight
-        KohonenNeuron winner = neurons[1][0];
-        double minSum = 0;
+        KohonenNeuron winner = (KohonenNeuron) neurons[1][0];
+        double maxSum = 0;
         for(int i = 0; i < neurons.length; i++){
             for(int j = 0; j < neurons[i].length; j++){
 
@@ -52,13 +54,14 @@ public class KohonenNetwork extends Network{
                 } else { //Kohonen layer
                     double sum = 0;
                     for(int k = 0; k < neurons[0].length; k++){
-                        sum += Math.pow(neurons[0][k].getNeuronValue() - neurons[0][k].getWeight(j), 2);
+                        sum += neurons[0][k].fire(j);
                     }
-                    sum = Math.sqrt(sum);
-                    if(j == 0 || sum < minSum){
-                        minSum = sum;
+                    neurons[i][j].setNeuronValue(sum);
+
+                    if(j == 0 || sum > maxSum){
+                        maxSum = sum;
                         winner.setNeuronVector(new double[]{0});
-                        winner = neurons[1][j];
+                        winner = (KohonenNeuron) neurons[1][j];
                     }
 
                 }
@@ -68,7 +71,14 @@ public class KohonenNetwork extends Network{
 
         //Cluster input vector
         winner.setNeuronVector(input);
-        return new double[]{winner.indexInLayer};
+
+        double[] result = new double[outputSize];
+        for(int i = 0; i < outputSize; i++){
+            result[i] = neurons[neurons.length - 1][i].getNeuronValue();
+        }
+
+        return result;
+
     }
 
     private static final Font FONT = Font.font("serif", FontWeight.BOLD, FontPosture.REGULAR, 25);

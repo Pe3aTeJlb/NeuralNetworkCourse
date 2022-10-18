@@ -1,18 +1,21 @@
 package rules;
 
-import network.KohonenNetwork;
+import network.CPNetwork;
 import network.Network;
 import network.Neuron;
 
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Scanner;
 
-public class Kohonen extends Rule{
+public class CPN extends Rule{
 
-    private String regex = "^([1-9][0-9]*+(\\s)?){2}$";
-    private String prompt = "example: 4 2";
+    private String regex = "^([1-9][0-9]*+(\\s)?){3}$";
+    private String prompt = "example: 2 2 2";
 
-    private KohonenNetwork net;
+    private CPNetwork net;
 
     private double learnSpeed = 0.5;
     private double learnSlowDown = 0.002;
@@ -20,13 +23,13 @@ public class Kohonen extends Rule{
 
     @Override
     public void createNetwork(int[] inputNeuronsCount) {
-        net = new KohonenNetwork(inputNeuronsCount);
+        net = new CPNetwork(inputNeuronsCount);
         net.setRule(this);
     }
 
     @Override
     public void setNetwork(Network network) {
-        net = (KohonenNetwork) network;
+        net = (CPNetwork) network;
         net.setRule(this);
     }
 
@@ -59,7 +62,6 @@ public class Kohonen extends Rule{
 
         }
 
-
         double lSpeed = learnSpeed;
 
         while (lSpeed > 0) {
@@ -76,6 +78,7 @@ public class Kohonen extends Rule{
 
                 for (int i = 0; i < cycles; i++) {
 
+                    //Kohonen layer
                     //Calculate length between neuron and input vector
                     double minSum = 0;
                     Neuron winner = net.neurons[1][0];
@@ -86,7 +89,6 @@ public class Kohonen extends Rule{
                             sum += Math.pow(data[k] - net.neurons[0][k].getWeight(j), 2);
                         }
                         sum = Math.sqrt(sum);
-                        System.out.println("neuron " + j + " len " + sum);
                         if (j == 0 || sum < minSum) {
                             minSum = sum;
                             winner = net.neurons[1][j];
@@ -95,10 +97,18 @@ public class Kohonen extends Rule{
                     }
 
                     for (int j = 0; j < net.neurons[0].length; j++) {
-                        System.out.println("updw " + j + ": " + data[j]+ " " + net.neurons[0][j].getWeight(winner.indexInLayer));
                         net.neurons[0][j].updateWeight(
                                 winner.indexInLayer, lSpeed * (data[j] - net.neurons[0][j].getWeight(winner.indexInLayer))
                         );
+                    }
+
+                    //Grossberg layer
+                    for(int j = 0; j < net.neurons[1].length; j++){
+                        for(int k = 0; k < net.neurons[2].length; k++){
+                            net.neurons[1][j].updateWeight(
+                                    k, lSpeed * net.neurons[1][j].getNeuronValue() * (data[k] - net.neurons[1][j].getWeight(k))
+                            );
+                        }
                     }
 
                 }
@@ -109,14 +119,8 @@ public class Kohonen extends Rule{
 
         }
 
-        //Print weights vector
-        double[] weights = new double[net.neurons[0].length];
-        for(int i = 0; i < net.neurons[1].length; i++) {
-            for (int j = 0; j < net.neurons[0].length; j++) {
-                weights[j] = net.neurons[0][j].getWeight(i);
-            }
-            System.out.println(i + " weight vector: " + Arrays.toString(weights));
-        }
+
+
 
     }
 
@@ -132,7 +136,7 @@ public class Kohonen extends Rule{
 
     @Override
     public String toString() {
-        return "Kohonen Net";
+        return "CPN";
     }
 
 }

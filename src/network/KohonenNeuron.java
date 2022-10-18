@@ -22,6 +22,7 @@ public class KohonenNeuron extends Neuron{
 
     @Override
     public void reset(){
+        neuronValue = 0;
         Arrays.fill(neuronVector, 0.0);
         Arrays.fill(weight, 0.0);
         Random r = new Random();
@@ -37,11 +38,8 @@ public class KohonenNeuron extends Neuron{
         gc.strokeOval(posX, posY, radius, radius);
         gc.fillOval(posX, posY, radius, radius);
         gc.setFill(Color.BLACK);
-        if(neuronValue != 0) {
-            gc.fillText(String.format("%.4f", neuronValue), posX + radius/2, posY + radius/2);
-        } else {
-            gc.fillText(Arrays.toString(neuronVector), posX + radius / 2, posY + radius / 2);
-        }
+        gc.fillText(Arrays.toString(neuronVector), posX + radius / 2, posY + 20 + radius / 2);
+        gc.fillText(String.format("%.4f", neuronValue), posX + radius/2, posY - 20 + radius/2);
         pos = new Point2D(posX, posY);
     }
 

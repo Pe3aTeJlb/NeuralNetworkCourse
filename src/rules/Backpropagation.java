@@ -11,12 +11,16 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Backpropagation extends Rule{
 
+    private String regex = "^([1-9][0-9]*+(\\s)?)+$";
+    private String prompt = "example: 2 ... 1";
+
     private BackprogNetwork net;
 
     private double learnSpeed = 0.5;
     private double netMeanSquaredError;
 
-    public Backpropagation(int[] inputNeuronsCount){
+    @Override
+    public void createNetwork(int[] inputNeuronsCount) {
         net = new BackprogNetwork(inputNeuronsCount);
         net.setRule(this);
     }
@@ -134,6 +138,16 @@ public class Backpropagation extends Rule{
 
     private double sigmoidDerivative(double val) {
         return (val * (1.0 - val));
+    }
+
+    @Override
+    public String getRegex() {
+        return regex;
+    }
+
+    @Override
+    public String getPrompt() {
+        return prompt;
     }
 
     @Override

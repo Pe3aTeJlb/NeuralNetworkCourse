@@ -11,9 +11,13 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class RBFNRule extends Rule{
 
+    private String regex = "^([1-9][0-9]*+(\\s)?){2}+$";
+    private String prompt = "example: 2 2 1";
+
     private RBFNetwork net;
 
-    public RBFNRule(int[] inputNeuronsCount){
+    @Override
+    public void createNetwork(int[] inputNeuronsCount) {
         this.net = new RBFNetwork(inputNeuronsCount);
         net.setRule(this);
     }
@@ -87,111 +91,18 @@ public class RBFNRule extends Rule{
     }
 
     @Override
+    public String getRegex() {
+        return regex;
+    }
+
+    @Override
+    public String getPrompt() {
+        return prompt;
+    }
+
+    @Override
     public String toString() {
         return "RBF";
     }
 
 }
-
-class rbfn {
-    public static void main(String a[]){
-        Net n=new rbfn().new Net();
-        for(int i=0;i<100;i++){
-            n.train();
-        }
-        n.test(new double[]{0,0});
-        n.test(new double[]{0,1});
-        n.test(new double[]{1,0});
-        n.test(new double[]{1,1});
-
-
-    }
-
-    class Net{
-        double[][] inputs=new double[][]{{0,0},{0,1},{1,0},{1,1}};
-        double[] outputs= {1,0,0,1};
-        Unit[] net =new Unit[2];
-
-        Net(){
-            net[0]=new Unit(0.5,new double[]{0,0},0.5);
-            net[1]=new Unit(0.5,new double[]{1,1},0.5);
-        }
-
-        void train(){
-            for(int i=0;i<inputs.length;i++){
-                double output=outputs[i];
-                double predictedoutput=0;
-                for(int j=0;j<inputs[i].length;j++){
-                    predictedoutput+=net[j].phi(inputs[i])*net[j].w;
-                }
-                //predictedoutput= Math.round(predictedoutput);
-
-                for(int j=0;j<inputs[i].length;j++){
-                    net[j].update(inputs[i], output, predictedoutput);
-                }
-            }
-        }
-
-        void test(double[] inputs){
-            double predictedOutput=0;
-            for(int i=0;i<inputs.length;i++){
-                predictedOutput+=net[i].phi(inputs)*net[i].w;
-                System.out.print("| " + net[i].w +"\t"+net[i].c[0]+"\t"+net[i].c[1]+"\t");
-            }
-            System.out.println();
-            for(int i=0;i<inputs.length;i++){
-                System.out.print("- " +inputs[i]+"\t");
-            }
-            System.out.print(predictedOutput);
-            System.out.println();
-
-        }
-
-
-        class Unit{
-            double w;
-            double c[];
-            double sigma;
-            double n1=0.1;
-            double n2=0.1;
-            Unit(double sigma,double[] center,double weight){
-                this.sigma=sigma;
-                this.c=center;
-                this.w=weight;
-
-            }
-
-            double phi(double[] input){
-                double distance=0;
-                for(int i=0;i<c.length;i++)
-                    distance+=Math.pow(input[i]-c[i],2);
-                return Math.pow(Math.E,- distance/(2*Math.pow(sigma, 2)));
-            }
-
-            void update(double[] input,double desired,double output){
-                double phi=phi(input);
-                double diffOutput=desired-output;
-
-                for(int i=0;i<c.length;i++)
-                    c[i]=c[i]+ (n1*diffOutput*w* phi*(input[i]-c[i])/(sigma*sigma));
-
-
-                w=w+(n2*diffOutput*phi);
-            }
-        }
-    }
-}
-
-/*
-* 'multiquadric': lambda x: np.sqrt(x**2 + 1),
-    'inverse':      lambda x: 1.0 / np.sqrt(x**2 + 1),
-    'gaussian':     lambda x: np.exp(-x**2),
-    'linear':       lambda x: x,
-    'quadric':      lambda x: x**2,
-    'cubic':        lambda x: x**3,
-    'quartic':      lambda x: x**4,
-    'quintic':      lambda x: x**5,
-    'thin_plate':   lambda x: x**2 * np.log(x + 1e-10),
-    'logistic':     lambda x: 1.0 / (1.0 + np.exp(-np.clip(x, -5, 5))),
-    'smoothstep':   lambda x: ((np.clip(1.0 - x, 0.0, 1.0))**2.0) * (3 - 2*(np.clip(1.0 - x, 0.0, 1.0)))
-}*/

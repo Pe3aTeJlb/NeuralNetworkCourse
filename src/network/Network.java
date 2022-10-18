@@ -58,6 +58,8 @@ public class Network {
     }
 
     public double[] simulate(double[] input){
+
+        clearNeurons();
         //Update input layers weight
         for(int i = 0; i < neurons.length; i++){
             for(int j = 0; j < neurons[i].length; j++){
@@ -80,7 +82,9 @@ public class Network {
         for(int i = 0; i < outputSize; i++){
             result[i] = neurons[neurons.length - 1][i].getNeuronValue();
         }
+
         return result;
+
     }
 
     public void updateBias(double targetValue) {
@@ -94,6 +98,16 @@ public class Network {
 
     public void setBias(double bias) {
         this.bias = bias;
+    }
+
+    public void clearNeurons(){
+
+        for(int i = 0; i < neurons.length; i++){
+            for(int j = 0; j < neurons[i].length; j++){
+                neurons[i][j].setNeuronValue(0);
+            }
+        }
+
     }
 
     public void reset(){
@@ -112,18 +126,17 @@ public class Network {
 
     public void draw(GraphicsContext gc){
 
-        double centerY = gc.getCanvas().getWidth() / 2;
+        double centerY = gc.getCanvas().getHeight() / 2;
 
         double posX = 150;
-        double posY = centerY + (inputSize * neuronStep) / 2;
-
+        double posY = centerY - ((inputSize * neuronStep) / 2);
 
         for(int i = 0; i < neurons.length; i++){
             for(int j = 0; j < neurons[i].length; j++){
                 neurons[i][j].draw(gc, posX, posY);
                 posY += neuronStep;
             }
-            posY = centerY + (inputSize * neuronStep) / 2;
+            posY = centerY - ((inputSize * neuronStep) / 2);
             posX += layerStep;
         }
 
@@ -137,14 +150,14 @@ public class Network {
         }
 
         posX = 150;
-        posY = centerY + (inputSize * neuronStep) / 2;
+        posY = centerY - ((inputSize * neuronStep) / 2);
 
         for(int i = 0; i < neurons.length; i++){
             for(int j = 0; j < neurons[i].length; j++){
                 neurons[i][j].draw(gc, posX, posY);
                 posY += neuronStep;
             }
-            posY = centerY + (inputSize * neuronStep) / 2;
+            posY = centerY - ((inputSize * neuronStep) / 2);
             posX += layerStep;
         }
 

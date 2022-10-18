@@ -11,9 +11,14 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class HebbRule extends Rule {
 
+    private String regex = "^([1-9][0-9]*+(\\s)?)+$";
+    private String prompt = "example: 2 ... 1";
+
     private Network net;
 
-    public HebbRule(int[] inputNeuronsCount){
+
+    @Override
+    public void createNetwork(int[] inputNeuronsCount) {
         net = new Network(inputNeuronsCount);
         net.setRule(this);
     }
@@ -91,6 +96,16 @@ public class HebbRule extends Rule {
 
         System.out.println("Bias " + net.getBias());
 
+    }
+
+    @Override
+    public String getRegex() {
+        return regex;
+    }
+
+    @Override
+    public String getPrompt() {
+        return prompt;
     }
 
     @Override

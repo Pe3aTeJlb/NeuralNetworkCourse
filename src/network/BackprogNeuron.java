@@ -11,7 +11,6 @@ import java.util.function.Function;
 public class BackprogNeuron extends Neuron{
 
     private Function<Double, Double> activationFunc = (x) -> 1 / (1 + Math.pow(Math.E,-x));
-    //private Function<Double, Double> activationFunc = (x) -> Math.tanh(x);
 
     private final double rangeMin = -0.4;
     private final double rangeMax = 0.4;
@@ -30,14 +29,8 @@ public class BackprogNeuron extends Neuron{
     @Override
     public void activate(double input){
         neuronValue = activationFunc.apply(input);
-       // System.out.println("actiovation " + neuronValue + " with input " + input);
     }
-/*
-    @Override
-    public double fire(int index, double input){
-        return activationFunc.apply(input) * weight[index];
-    }
-*/
+
     @Override
     public void reset(){
         neuronValue = 0;

@@ -1,5 +1,6 @@
 package gui;
 
+import javafx.beans.property.SimpleStringProperty;
 import rules.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -12,6 +13,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.util.StringConverter;
 import network.Network;
+
+import java.util.regex.Pattern;
 
 
 public class Controller {
@@ -29,6 +32,9 @@ public class Controller {
 
     @FXML
     private ChoiceBox<String> learningRuleChbx;
+
+    private SimpleStringProperty promptProperty = new SimpleStringProperty("");
+    private String regex;
 
 
     @FXML
@@ -63,36 +69,13 @@ public class Controller {
 
         cvcontext = cv.getGraphicsContext2D();
         transform = new double[6];
-        transform[0] = transform[3] = 0.5;
+        transform[0] = transform[3] = 1;
         transform[1] = transform[2] = transform[4] = transform[5] = 0;
         updateTransform();
 
 
 
-        applyBtn.disableProperty().bind(learningRuleChbx.valueProperty().isNull().or(netDescTxtFld.textProperty().isEmpty()));
-        applyBtn.setOnAction(event -> {
-            String[] netDesc = netDescTxtFld.getText().trim().split(" ");
-            int[] neuronsDesc = new int[netDesc.length];
-            for(int i = 0; i < netDesc.length; i++){
-                neuronsDesc[i] = Integer.parseInt(netDesc[i]);
-            }
-
-            switch (learningRuleChbx.getValue()){
-
-                case "HebbRule": rule = new HebbRule(neuronsDesc); break;
-                case "DeltaRule": rule = new DeltaRule(neuronsDesc); break;
-                case "BackPropagation": rule = new Backpropagation(neuronsDesc); break;
-                case "RBFNRule":  rule = new RBFNRule(neuronsDesc); break;
-                case "Kohonen Net": rule = new Kohonen(neuronsDesc); break;
-
-            }
-
-            net = rule.getNetwork();
-            clearRect40K();
-            net.draw(cvcontext);
-
-        });
-
+        netDescTxtFld.promptTextProperty().bind(promptProperty);
 
         ObservableList<String> rules = FXCollections.observableArrayList();
         rules.addAll(
@@ -100,9 +83,72 @@ public class Controller {
                 "DeltaRule",
                 "BackPropagation",
                 "RBFNRule",
-                "Kohonen Net"
+                "Kohonen Net",
+                "CPN",
+                "Hopfield",
+                "CNN"
         );
         learningRuleChbx.getItems().addAll(rules);
+        learningRuleChbx.setOnAction(event -> {
+
+            switch (learningRuleChbx.getValue()){
+                case "HebbRule": rule = new HebbRule(); break;
+                case "DeltaRule": rule = new DeltaRule(); break;
+                case "BackPropagation": rule = new Backpropagation(); break;
+                case "RBFNRule":  rule = new RBFNRule(); break;
+                case "Kohonen Net": rule = new Kohonen(); break;
+                case "CPN": rule = new CPN(); break;
+                case "Hopfield": rule = new Hopfield(); break;
+                case "CNN": rule = new CNN(); break;
+            }
+
+            promptProperty.setValue(rule.getPrompt());
+            regex = rule.getRegex();
+
+            final Pattern pattern = Pattern.compile("([1-9]+(\\s)?)*");
+            TextFormatter<?> formatter = new TextFormatter<>(eve -> {
+                if (pattern.matcher(eve.getControlNewText()).matches()) {
+                    return eve; // allow this change to happen
+                } else {
+                    return null; // prevent change
+                }
+            });
+
+            netDescTxtFld.setTextFormatter(formatter);
+
+        });
+
+        applyBtn.disableProperty().bind(learningRuleChbx.valueProperty().isNull().or(netDescTxtFld.textProperty().isEmpty()));
+        applyBtn.setOnAction(event -> {
+
+            final Pattern pattern = Pattern.compile(regex);
+
+            if(pattern.matcher(netDescTxtFld.getText()).matches()) {
+
+                String[] netDesc = netDescTxtFld.getText().trim().split(" ");
+                int[] neuronsDesc = new int[netDesc.length];
+                for (int i = 0; i < netDesc.length; i++) {
+                    neuronsDesc[i] = Integer.parseInt(netDesc[i]);
+                }
+
+                rule.createNetwork(neuronsDesc);
+                net = rule.getNetwork();
+                clearRect40K();
+                net.draw(cvcontext);
+
+            } else {
+
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Neural Network Course");
+                alert.setHeaderText("Error:");
+                alert.setContentText("Bad network decription");
+
+                alert.showAndWait();
+
+            }
+
+        });
+
 
 
         ObservableList<String> datasets = FXCollections.observableArrayList();
@@ -113,9 +159,11 @@ public class Controller {
                 "/OrZ.txt",
                 "/XOR.txt",
                 "/XORZ.txt",
+                "/XOR_Kohonin.txt",
                 "/XNOR.txt",
                 "/XNORZ.txt",
-                "/Kohonen.txt"
+                "/Kohonen.txt",
+                "/Numbers7x9.txt"
         );
         datasetChbx.setConverter(new StringConverter<>() {
             @Override
@@ -266,7 +314,7 @@ public class Controller {
 
     private void clearRect40K() {
         cvcontext.setFill(Color.WHITESMOKE);
-        cvcontext.fillRect(0, 0, (cv.getWidth() / transform[0]) * 2, (cv.getHeight() / transform[0]) * 2);
+        cvcontext.fillRect(0, 0, (cv.getWidth() / transform[0]) * 4, (cv.getHeight() / transform[0]) * 4);
     }
 
     private void clearRect40K(double prevX, double prevY) {

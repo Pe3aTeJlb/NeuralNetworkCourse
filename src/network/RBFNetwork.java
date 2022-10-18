@@ -48,6 +48,7 @@ public class RBFNetwork extends Network{
     @Override
     public double[] simulate(double[] inputs) {
 
+        clearNeurons();
         //Update input layers weight
         for(int i = 0; i < neurons.length; i++){
             for(int j = 0; j < neurons[i].length; j++){

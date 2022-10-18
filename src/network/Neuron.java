@@ -27,7 +27,11 @@ public class Neuron {
 
     public void updateWeight(int index, double addWeight){
         this.weight[index] += addWeight;
-       // System.out.println("new weight " + weight[index]);
+        //System.out.println("new weight " + weight[index]);
+    }
+
+    public void normalyzeWeight(int index, double totalSum){
+        weight[index] = weight[index] / totalSum;
     }
 
     public double getWeight(int index) {
@@ -35,6 +39,7 @@ public class Neuron {
     }
 
     public double fire(int index){
+        System.out.println(neuronValue + " " + weight[index]);
         return neuronValue * weight[index];
     }
 

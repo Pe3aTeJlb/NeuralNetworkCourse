@@ -10,12 +10,17 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class DeltaRule extends Rule {
 
+    private String regex = "^([1-9][0-9]*+(\\s)?)+$";
+    private String prompt = "example: 2 ... 1";
+
     private Network net;
 
     private final double learnSpeed = 5;
     private final double targetError = 0.1;
 
-    public DeltaRule(int[] inputNeuronsCount){
+
+    @Override
+    public void createNetwork(int[] inputNeuronsCount) {
         net = new Network(inputNeuronsCount);
         net.setRule(this);
     }
@@ -95,6 +100,16 @@ public class DeltaRule extends Rule {
 
         System.out.println("Bias " + net.getBias());
 
+    }
+
+    @Override
+    public String getRegex() {
+        return regex;
+    }
+
+    @Override
+    public String getPrompt() {
+        return prompt;
     }
 
     @Override
