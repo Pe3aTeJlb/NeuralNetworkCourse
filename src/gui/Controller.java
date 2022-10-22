@@ -105,7 +105,7 @@ public class Controller {
             promptProperty.setValue(rule.getPrompt());
             regex = rule.getRegex();
 
-            final Pattern pattern = Pattern.compile("([1-9]+(\\s)?)*");
+            final Pattern pattern = Pattern.compile("(\\s)*([1-9][0-9]*+(\\s)*)*");
             TextFormatter<?> formatter = new TextFormatter<>(eve -> {
                 if (pattern.matcher(eve.getControlNewText()).matches()) {
                     return eve; // allow this change to happen
@@ -163,7 +163,8 @@ public class Controller {
                 "/XNOR.txt",
                 "/XNORZ.txt",
                 "/Kohonen.txt",
-                "/Numbers7x9.txt"
+                "/Numbers7x9.txt",
+                "/mnist.txt"
         );
         datasetChbx.setConverter(new StringConverter<>() {
             @Override

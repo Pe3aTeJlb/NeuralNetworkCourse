@@ -62,7 +62,7 @@ public class Backpropagation extends Rule{
 
         netMeanSquaredError = 0;
         //int cnt = 0;
-        for (int r = 0; r < 10000; r++) {
+        for (int r = 0; r < 100000; r++) {
         //for(double[] data: parsedData) {
          //   do {
             double[] data = parsedData.get(ThreadLocalRandom.current().nextInt(0, parsedData.size()));

@@ -11,7 +11,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class RBFNRule extends Rule{
 
-    private String regex = "^([1-9][0-9]*+(\\s)?){2}+$";
+    private String regex = "^([1-9][0-9]*+(\\s)?){3}+$";
     private String prompt = "example: 2 2 1";
 
     private RBFNetwork net;
